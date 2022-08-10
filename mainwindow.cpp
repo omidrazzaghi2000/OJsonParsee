@@ -10,7 +10,12 @@
 #include <QComboBox>
 #include <QFile>
 #include <QDebug>
-
+#include <QMessageBox>
+#include <QGroupBox>
+// memory
+#include <vector>
+#include <variant>
+#include <map>
 //json specific
 #include <QJsonParseError>
 #include <QJsonDocument>
@@ -18,6 +23,9 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QJsonValue>
+#include <ConfigOBlock.h>
+
+#include <QProcess>
 
 using json = nlohmann::json;
 
@@ -30,11 +38,41 @@ MainWindow::MainWindow(QWidget *parent)
 //    std::ifstream f("/home/manofaction/Documents/omid-project/JsonParser/OJsonParsee/jsonExample.json");
 
 
+//    auto process = new QProcess(this);
+//    connect(process,&QProcess::finished,[this](int e ,QProcess::ExitStatus){
+//        if(e == 0){
+//            this->readJson();
+//        }
+//        else
+//        {
+//            qDebug() << "e";
+//        }
+
+//    });
+//    connect(process,&QProcess::readyReadStandardError,[process](){
+//        qDebug() << "OPMID";
+//        qDebug() << process->readAllStandardError().data();
+//    });
+//    QString script = "echo";
+//    process->start(script,QStringList() << "navid/jhkl");
+
+//    self.p.finished.connect(self.process_finished)
+//    self.p.readyReadStandardError.connect(self.error_occured)
+//    self.p.start("./script.sh")
 
 
+    ConfigOblockSize = sizeof(ConfigOBlock);
+    tempConfig = new char[ConfigOblockSize];
+    memset((void *)tempConfig,0,ConfigOblockSize);
+    temp = tempConfig;
+    qDebug();
+    readJson();
+    }
 
+
+void MainWindow::readJson(){
     QFile file;
-    file.setFileName("/home/manofaction/Documents/omid-project/JsonParser/OJsonParsee/jsonExample.json");
+    file.setFileName("/home/manofaction/Documents/omid-project/JsonParser/OJsonParsee/jsonExample.json1");
     if(!file.open(QIODevice::ReadOnly)){
        qDebug() << "Json filef couldn't be opened/found";
        return;
@@ -55,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
     QJsonObject data;
     data = jsonDoc.object();
 
+
     qDebug() << data.value("configs").toArray().at(0).toObject().value("label").toString();
 
     QGridLayout * ConfigGridLayout = ui->gridLayout_config;
@@ -68,12 +107,26 @@ MainWindow::MainWindow(QWidget *parent)
             QString label = data.value("configs").toArray().at(i).toObject().value("label").toString();
             ConfigGridLayout->addWidget(new QLabel(label.replace('"',' ')),i+1,1);
             auto check_box = new QCheckBox();
+
+            // connection between draft and vector
+            dictation[QString::number(i)] = check_box;
+            draft.push_back(check_box->isChecked());
+            connect(check_box,SIGNAL(toggled(bool)),this,SLOT(checkBoxSlot(bool)));
+
+            configDictionary[QString::number(i)] = temp;
+            temp += sizeof(bool);
+
+
             ConfigGridLayout->addWidget(check_box,i+1,2);
-        }else if(data.value("configs").toArray().at(i).toObject().value("type") == "text"){
+        }
+        else if(data.value("configs").toArray().at(i).toObject().value("type") == "text")
+        {
             QString label = data.value("configs").toArray().at(i).toObject().value("label").toString();
             ConfigGridLayout->addWidget(new QLabel(label.replace('"',' ')),i+1,1);
             ConfigGridLayout->addWidget(new QLineEdit(),i+1,2);
-        }else if(data.value("configs").toArray().at(i).toObject().value("type") == "enum"){
+        }
+        else if(data.value("configs").toArray().at(i).toObject().value("type") == "enum")
+        {
             QString label = data.value("configs").toArray().at(i).toObject().value("label").toString();
             ConfigGridLayout->addWidget(new QLabel(label.replace('"',' ')),i+1,1);
 
@@ -82,7 +135,9 @@ MainWindow::MainWindow(QWidget *parent)
                 combo->addItem(data.value("configs").toArray().at(i).toObject().value("enums").toArray().at(j).toString());
             }
             ConfigGridLayout->addWidget(combo,i+1,2);
-        }else if(data.value("configs").toArray().at(i).toObject().value("type") == "struct"){
+        }
+        else if(data.value("configs").toArray().at(i).toObject().value("type") == "struct")
+        {
             QGridLayout * g = new QGridLayout();
             for(int j = 0; j < data.value("configs").toArray().at(i).toObject().value("struct").toArray().size() ; j++){
                 g->addWidget(new QLabel(data.value("configs").toArray().at(i).toObject().value("struct").toArray().at(j).toObject().value("label").toString()),j,0);
@@ -106,11 +161,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ConfigGridLayout->addWidget(structure_group_box,i+1,1,1,2);
             }
         }
-
-    }
-
-
-
+}
 
 
 //        QHBoxLayout *l;
@@ -210,4 +261,46 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::checkBoxSlot(bool b)
+{
+    auto ref = dynamic_cast<QCheckBox*>(sender());
+    int i;
+    for(i = 0 ; i < dictation.size() ; i++)
+    {
+        if(ref == dictation[QString::number(i)]){
+            std::get<bool>(draft.at(i))=b;
+            break;
+        }
+    }
+
+    memcpy(
+    configDictionary[QString::number(i)],
+    &b,
+    sizeof(bool));
+
+}
+
+
+void MainWindow::on_apply_pb_clicked()
+{
+    QString temp1{""};
+   for(size_t i = 0 ; i < draft.size() ; i++)
+   {
+       if(std::get<bool>(draft.at(i))){
+           temp1+= "\nTrue";
+       }else{
+           temp1+= "\nFalse";
+       }
+   }
+
+
+   QMessageBox::critical(this,"Error",temp1);
+    struct ConfigOBlock Alireza ;
+   Alireza.a = static_cast<bool>(tempConfig[0]);
+   Alireza.b = static_cast<bool>(tempConfig[1]);
+   qDebug();
+}
+
+
 

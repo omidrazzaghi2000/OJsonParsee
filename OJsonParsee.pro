@@ -13,6 +13,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    ConfigOBlock.h \
     mainwindow.h
 
 FORMS += \

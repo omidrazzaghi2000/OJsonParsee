@@ -13,7 +13,19 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    void readJson();
     ~MainWindow();
+    std::vector<std::variant<int,float,std::string,bool>> draft;
+    std::map<QString,void * > dictation;//int instead use vector
+    std::map<QString,void *> configDictionary;
+    char * tempConfig;
+    int ConfigOblockSize;
+    char * temp;
+
+public slots:
+    void checkBoxSlot(bool b);
+private slots:
+    void on_apply_pb_clicked();
 
 private:
     Ui::MainWindow *ui;

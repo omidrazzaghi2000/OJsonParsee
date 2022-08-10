@@ -1,0 +1,15 @@
+{
+  "configs": [
+    
+    {
+      "label":"bool1",
+      "type" :"bool",
+      "kind" :"bool"
+    },
+    {
+      "label":"bool2",
+      "type":"bool",
+      "kind":"bool"
+    }
+    ]
+}
