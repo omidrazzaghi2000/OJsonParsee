@@ -2,59 +2,65 @@
   "configs": [
     
     {
-      "label":"INTEGER",
+      "label":"boolean",
+      "type" :"bool",
+      "kind" :"bool"
+    },
+    {
+      "label":"integer",
       "type" :"text",
       "kind" :"int"
     },
     {
-      "label":"CHAR_STAR",
+      "label":"float",
       "type":"text",
-      "kind":"char*"
+      "kind":"float"
     },
     {
-      "label":"STRING",
+      "label":"double",
       "type":"text",
-      "kind":"std::string"
+      "kind":"double"
     },
-    
     {
       "label":"ENUM",
       "type":"enum",
       "enums":[
-        "IRAN","USA","UNITED KINGDOM","WALES"
+        "IRAN","USA","UK","WALES"
       ]
     },
     {
-          "label": "SENUM",
-          "type":"enum",
-          "enums":[
-            "MOHAMMAD","ALI","HASSAN","HOSSIEN","FATEMEH"
-          ]
-        },
-        {
-          "label": "STENUM",
-          "type":"enum",
-          "enums":[
-            "MOHAMMAD","ALI","HASSAN","HOSSIEN","FATEMEH"
-          ]
-        },
-    {
-      "label":"STRUCTURE",
+      "label":"Zoo",
       "type":"struct",
       "struct":[
         {
-          "label": "STRUCTURE_INT",
+          "label": "AnimalCounter",
           "type":"text",
-          "kind":"int32_t"
+          "kind":"int"
         },
         {
-          "label": "STRUCTURE_ENUM",
+          "label": "Temperatrue",
+          "type":"text",
+          "kind":"float"
+        },
+        {
+          "label": "Country",
           "type":"enum",
           "enums":[
-            "MOHAMMAD","ALI","HASSAN","HOSSIEN","FATEMEH"
+            "IRAN","USA","UK","WALES"
           ]
         }
       ]
+    },
+    {
+      "label":"boolean2",
+      "type" :"bool",
+      "kind" :"bool"
+    },
+    {
+      "label":"array of int",
+      "type" :"array",
+      "kind" :"int",
+      "arrlength" : 4
     }
     ]
 }
